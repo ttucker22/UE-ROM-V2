@@ -1160,7 +1160,7 @@ const SHOULDERInternalExternalRotationData = [
 // Function to find impairment percentage based on angle
 function findImpairment(data, angle, type) {
     for (const entry of data) {
-        if (angle == entry[type]) {
+        if (entry[type] == angle) {
             return entry[`ue${type.charAt(0).toUpperCase() + type.slice(1)}`];
         }
     }
@@ -1171,7 +1171,7 @@ function findImpairment(data, angle, type) {
 function calculateJointImpairment(jointData, angleInputs, impairmentElements) {
     let totalImpairment = 0;
     angleInputs.forEach((input, index) => {
-        const angle = document.getElementById(input).value;
+        const angle = parseFloat(document.getElementById(input).value) || 0;
         const impairment = findImpairment(jointData[index], angle, input.split('-')[1]);
         document.getElementById(impairmentElements[index]).innerText = impairment;
         totalImpairment += impairment;
@@ -1188,6 +1188,7 @@ function updateImpairment() {
     );
     document.getElementById('wrist-total-imp').innerText = `${wristImpairment} UE = ${Math.round(wristImpairment * 0.6)} WPI`;
 
+    // Calculate and update impairment for elbow
     const elbowImpairment = calculateJointImpairment(
         [ELBOWFlexionExtensionData, ELBOWPronationSupinationData],
         ['elbow-flexion-angle', 'elbow-extension-angle', 'elbow-pronation-angle', 'elbow-supination-angle'],
@@ -1195,6 +1196,7 @@ function updateImpairment() {
     );
     document.getElementById('elbow-total-imp').innerText = `${elbowImpairment} UE = ${Math.round(elbowImpairment * 0.6)} WPI`;
 
+    // Calculate and update impairment for shoulder
     const shoulderImpairment = calculateJointImpairment(
         [SHOULDERFlexionExtensionData, SHOULDERAbductionAdductionData, SHOULDERInternalExternalRotationData],
         ['shoulder-flexion-angle', 'shoulder-extension-angle', 'shoulder-abduction-angle', 'shoulder-adduction-angle', 'shoulder-introt-angle', 'shoulder-extrot-angle'],
@@ -1216,6 +1218,10 @@ document.getElementById('clearAllButton').addEventListener('click', () => {
     document.querySelectorAll('td[id$="-imp"]').forEach(td => {
         td.innerText = '0';
     });
+    document.getElementById('wrist-total-imp').innerText = '0 UE = 0 WPI';
+    document.getElementById('elbow-total-imp').innerText = '0 UE = 0 WPI';
+    document.getElementById('shoulder-total-imp').innerText = '0 UE = 0 WPI';
+});
     document.getElementById('wrist-total-imp').innerText = '0 UE = 0 WPI';
     document.getElementById('elbow-total-imp').innerText = '0 UE = 0 WPI';
     document.getElementById('shoulder-total-imp').innerText = '0 UE = 0 WPI';
