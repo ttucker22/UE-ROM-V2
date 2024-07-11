@@ -1571,11 +1571,11 @@ function calculateImpairment(angle, dataArray, angleKey, impairmentKey) {
 
     const isUlnarDeviation = angleKey === 'ulnarDeviation';
     
-    for (let i = 0; i < dataArray.length; i++) {
+    for (let i = dataArray.length - 1; i >= 0; i--) {
         const currentAngle = dataArray[i][angleKey];
-        const nextAngle = i < dataArray.length - 1 ? dataArray[i + 1][angleKey] : null;
+        const prevAngle = i > 0 ? dataArray[i - 1][angleKey] : null;
 
-        console.log(`Checking: currentAngle = ${currentAngle}, nextAngle = ${nextAngle}, angle = ${angle}`);
+        console.log(`Checking: currentAngle = ${currentAngle}, prevAngle = ${prevAngle}, angle = ${angle}`);
 
         if (typeof currentAngle === 'string') {
             if (currentAngle.startsWith('>') && angle > parseFloat(currentAngle.substring(1))) {
@@ -1587,25 +1587,25 @@ function calculateImpairment(angle, dataArray, angleKey, impairmentKey) {
         } else if (isUlnarDeviation) {
             if (angle >= 0) {
                 // For positive ulnar deviation angles
-                if (currentAngle >= 0 && (angle === currentAngle || (nextAngle !== null && angle > currentAngle && angle <= nextAngle))) {
+                if (angle <= Math.abs(currentAngle) && (prevAngle === null || angle > Math.abs(prevAngle))) {
                     console.log(`Match found for positive ulnar deviation: ${dataArray[i][impairmentKey]}`);
                     return dataArray[i][impairmentKey];
                 }
             } else {
                 // For negative ulnar deviation angles
-                if (currentAngle < 0 && (angle === currentAngle || (nextAngle !== null && angle < currentAngle && angle >= nextAngle))) {
+                if (angle >= currentAngle && (prevAngle === null || angle < prevAngle)) {
                     console.log(`Match found for negative ulnar deviation: ${dataArray[i][impairmentKey]}`);
                     return dataArray[i][impairmentKey];
                 }
             }
         } else {
-            if (angle === currentAngle || (nextAngle !== null && angle > currentAngle && angle <= nextAngle)) {
+            if (angle >= currentAngle && (prevAngle === null || angle < prevAngle)) {
                 return dataArray[i][impairmentKey];
             }
         }
     }
 
-    console.log('No exact match found, returning 0');
+    console.log('No match found, returning 0');
     return 0;
 }
         
