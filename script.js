@@ -1160,7 +1160,7 @@ const SHOULDERInternalExternalRotationData = [
 // Function to find impairment percentage based on angle
 function findImpairment(data, angle, type) {
     for (const entry of data) {
-        if (angle == entry[type]) {
+        if (entry[type] == angle) {
             return entry[`ue${type.charAt(0).toUpperCase() + type.slice(1)}`];
         }
     }
@@ -1172,7 +1172,7 @@ function calculateJointImpairment(jointData, angleInputs, impairmentElements) {
     let totalImpairment = 0;
     angleInputs.forEach((input, index) => {
         const angle = parseFloat(document.getElementById(input).value) || 0;
-        const type = input.split('-')[1];
+        const type = input.split('-')[1].replace('rd', 'RadialDeviation').replace('ud', 'UlnarDeviation').replace('introt', 'InternalRotation').replace('extrot', 'ExternalRotation');
         const impairment = findImpairment(jointData[index], angle, type);
         document.getElementById(impairmentElements[index]).innerText = impairment;
         totalImpairment += impairment;
