@@ -1181,21 +1181,21 @@ function findImpairment(angle, dataArray, angleField) {
 
 // Function to update impairment values for a joint
 function updateJointImpairment(jointPrefix, dataFlexExt, dataRadUln) {
-    // Get angle values
-    let flexionAngle = parseInt(document.getElementById(jointPrefix + '-flexion-angle').value) || 0;
-    let extensionAngle = parseInt(document.getElementById(jointPrefix + '-extension-angle').value) || 0;
-    let flexextAnkylosisAngle = parseInt(document.getElementById(jointPrefix + '-flexext-ankylosis-angle').value) || 0;
-    let rdAngle = parseInt(document.getElementById(jointPrefix + '-rd-angle').value) || 0;
-    let udAngle = parseInt(document.getElementById(jointPrefix + '-ud-angle').value) || 0;
-    let rdudAnkylosisAngle = parseInt(document.getElementById(jointPrefix + '-rdud-ankylosis-angle').value) || 0;
+    // Get angle values, check if they are valid numbers
+    let flexionAngle = parseInt(document.getElementById(jointPrefix + '-flexion-angle').value);
+    let extensionAngle = parseInt(document.getElementById(jointPrefix + '-extension-angle').value);
+    let flexextAnkylosisAngle = parseInt(document.getElementById(jointPrefix + '-flexext-ankylosis-angle').value);
+    let rdAngle = parseInt(document.getElementById(jointPrefix + '-rd-angle').value);
+    let udAngle = parseInt(document.getElementById(jointPrefix + '-ud-angle').value);
+    let rdudAnkylosisAngle = parseInt(document.getElementById(jointPrefix + '-rdud-ankylosis-angle').value);
 
-    // Find impairments from data arrays
-    let flexionImp = findImpairment(flexionAngle, dataFlexExt, 'flexion');
-    let extensionImp = findImpairment(extensionAngle, dataFlexExt, 'extension');
-    let flexextAnkylosisImp = findImpairment(flexextAnkylosisAngle, dataFlexExt, 'ankylosis');
-    let rdImp = findImpairment(rdAngle, dataRadUln, 'radialDeviation');
-    let udImp = findImpairment(udAngle, dataRadUln, 'ulnarDeviation');
-    let rdudAnkylosisImp = findImpairment(rdudAnkylosisAngle, dataRadUln, 'ankylosis');
+    // Find impairments from data arrays, only if angle is a number
+    let flexionImp = isNaN(flexionAngle) ? '' : findImpairment(flexionAngle, dataFlexExt, 'flexion');
+    let extensionImp = isNaN(extensionAngle) ? '' : findImpairment(extensionAngle, dataFlexExt, 'extension');
+    let flexextAnkylosisImp = isNaN(flexextAnkylosisAngle) ? '' : findImpairment(flexextAnkylosisAngle, dataFlexExt, 'ankylosis');
+    let rdImp = isNaN(rdAngle) ? '' : findImpairment(rdAngle, dataRadUln, 'radialDeviation');
+    let udImp = isNaN(udAngle) ? '' : findImpairment(udAngle, dataRadUln, 'ulnarDeviation');
+    let rdudAnkylosisImp = isNaN(rdudAnkylosisAngle) ? '' : findImpairment(rdudAnkylosisAngle, dataRadUln, 'ankylosis');
 
     // Update impairment fields in the HTML
     document.getElementById(jointPrefix + '-flexion-imp').textContent = flexionImp;
@@ -1205,9 +1205,17 @@ function updateJointImpairment(jointPrefix, dataFlexExt, dataRadUln) {
     document.getElementById(jointPrefix + '-ud-imp').textContent = udImp;
     document.getElementById(jointPrefix + '-rdud-ankylosis-imp').textContent = rdudAnkylosisImp;
 
-    // Calculate and update subtotals
-    let flexextImp = Math.max(flexionImp, extensionImp, flexextAnkylosisImp);
-    let rdudImp = Math.max(rdImp, udImp, rdudAnkylosisImp);
+    // Calculate and update subtotals, handling empty values
+    let flexextImp = Math.max(
+        isNaN(flexionImp) ? 0 : flexionImp, 
+        isNaN(extensionImp) ? 0 : extensionImp, 
+        isNaN(flexextAnkylosisImp) ? 0 : flexextAnkylosisImp
+    );
+    let rdudImp = Math.max(
+        isNaN(rdImp) ? 0 : rdImp, 
+        isNaN(udImp) ? 0 : udImp, 
+        isNaN(rdudAnkylosisImp) ? 0 : rdudAnkylosisImp
+    );
     document.getElementById(jointPrefix + '-flexext-imp').textContent = flexextImp;
     document.getElementById(jointPrefix + '-rdud-imp').textContent = rdudImp;
 
