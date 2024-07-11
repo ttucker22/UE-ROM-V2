@@ -1197,13 +1197,13 @@ function updateJointImpairment(jointPrefix, dataFlexExt, dataRadUln) {
     let udImp = isNaN(udAngle) ? '' : findImpairment(udAngle, dataRadUln, 'ulnarDeviation');
     let rdudAnkylosisImp = isNaN(rdudAnkylosisAngle) ? '' : findImpairment(rdudAnkylosisAngle, dataRadUln, 'ankylosis');
 
-    // Update impairment fields in the HTML
-    document.getElementById(jointPrefix + '-flexion-imp').textContent = flexionImp;
-    document.getElementById(jointPrefix + '-extension-imp').textContent = extensionImp;
-    document.getElementById(jointPrefix + '-flexext-ankylosis-imp').textContent = flexextAnkylosisImp;
-    document.getElementById(jointPrefix + '-rd-imp').textContent = rdImp;
-    document.getElementById(jointPrefix + '-ud-imp').textContent = udImp;
-    document.getElementById(jointPrefix + '-rdud-ankylosis-imp').textContent = rdudAnkylosisImp;
+    // Update impairment fields in the HTML, display 0 for empty entries
+    document.getElementById(jointPrefix + '-flexion-imp').textContent = flexionImp === '' ? '0' : flexionImp;
+    document.getElementById(jointPrefix + '-extension-imp').textContent = extensionImp === '' ? '0' : extensionImp;
+    document.getElementById(jointPrefix + '-flexext-ankylosis-imp').textContent = flexextAnkylosisImp === '' ? '0' : flexextAnkylosisImp;
+    document.getElementById(jointPrefix + '-rd-imp').textContent = rdImp === '' ? '0' : rdImp;
+    document.getElementById(jointPrefix + '-ud-imp').textContent = udImp === '' ? '0' : udImp;
+    document.getElementById(jointPrefix + '-rdud-ankylosis-imp').textContent = rdudAnkylosisImp === '' ? '0' : rdudAnkylosisImp;
 
     // Calculate and update subtotals, handling NaN values correctly
     let flexextImp;
