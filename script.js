@@ -1224,3 +1224,22 @@ function updateJointImpairment(jointPrefix, dataFlexExt, dataRadUln) {
     let wpi = Math.round(totalImp * 0.6); // Convert to WPI
     document.getElementById(jointPrefix + '-total-imp').textContent = totalImp + ' UE = ' + wpi + ' WPI';
 }
+
+// Event listeners for all input fields
+const inputFields = document.querySelectorAll('input[type="number"]');
+inputFields.forEach(input => {
+    input.addEventListener('input', () => {
+        // Determine which joint and data arrays to use based on input ID
+        if (input.id.startsWith('wrist')) {
+            updateJointImpairment('wrist', WRISTFlexionExtensionData, WRISTRadialUlnarDeviationData);
+        } else if (input.id.startsWith('elbow')) {
+            updateJointImpairment('elbow', ELBOWFlexionExtensionData, ELBOWPronationSupinationData);
+        } else if (input.id.startsWith('shoulder-flexion') || input.id.startsWith('shoulder-extension') || input.id.startsWith('shoulder-flexext')) {
+            // Only update flexion/extension for shoulder when those fields change
+            updateJointImpairment('shoulder', SHOULDERFlexionExtensionData, SHOULDERAbductionAdductionData); 
+        } else if (input.id.startsWith('shoulder-introt') || input.id.startsWith('shoulder-extrot') || input.id.startsWith('shoulder-rotation')) {
+            // Only update internal/external rotation for shoulder when those fields change
+            updateJointImpairment('shoulder', SHOULDERFlexionExtensionData, SHOULDERInternalExternalRotationData);
+        }
+    });
+});
