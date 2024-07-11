@@ -1165,14 +1165,14 @@ function findImpairment(angle, dataArray, angleField) {
         // Handle '<' and '>' cases
         if (typeof dataAngle === 'string') {
             if (dataAngle.startsWith('<') && angle <= parseInt(dataAngle.slice(1))) {
-                impairment = dataArray[i].ueAnkylosis; // Assuming ankylosis is used for these cases
+                impairment = dataArray[i]['ue' + angleField.charAt(0).toUpperCase() + angleField.slice(1)]; 
                 break;
             } else if (dataAngle.startsWith('>') && angle >= parseInt(dataAngle.slice(1))) {
-                impairment = dataArray[i].ueAnkylosis; // Assuming ankylosis is used for these cases
+                impairment = dataArray[i]['ue' + angleField.charAt(0).toUpperCase() + angleField.slice(1)]; 
                 break;
             }
         } else if (angle === dataAngle) {
-            impairment = dataArray[i].ueAnkylosis; // Assuming ankylosis is used for exact matches
+            impairment = dataArray[i]['ue' + angleField.charAt(0).toUpperCase() + angleField.slice(1)]; 
             break;
         }
     }
@@ -1217,16 +1217,32 @@ function updateJointImpairment(jointPrefix, dataFlexExt, dataRadUln) {
     document.getElementById(jointPrefix + '-total-imp').textContent = totalImp + ' UE = ' + wpi + ' WPI';
 }
 
-// Event listeners for input fields
-document.getElementById('wrist-flexion-angle').addEventListener('input', () => updateJointImpairment('wrist', WRISTFlexionExtensionData, WRISTRadialUlnarDeviationData));
-// Add similar event listeners for other input fields
+// Event listeners for all input fields
+const inputFields = document.querySelectorAll('input[type="number"]');
+inputFields.forEach(input => {
+    input.addEventListener('input', () => {
+        // Determine which joint and data arrays to use based on input ID
+        if (input.id.startsWith('wrist')) {
+            updateJointImpairment('wrist', WRISTFlexionExtensionData, WRISTRadialUlnarDeviationData);
+        } else if (input.id.startsWith('elbow')) {
+            updateJointImpairment('elbow', ELBOWFlexionExtensionData, ELBOWPronationSupinationData);
+        } else if (input.id.startsWith('shoulder')) {
+            updateJointImpairment('shoulder', SHOULDERFlexionExtensionData, SHOULDERAbductionAdductionData);
+            updateJointImpairment('shoulder', SHOULDERFlexionExtensionData, SHOULDERInternalExternalRotationData); // Call twice for shoulder, once for each plane of motion
+        }
+    });
+});
 
 // Clear all button functionality
 document.getElementById('clearAllButton').addEventListener('click', () => {
     // Clear all input fields
-    let inputs = document.querySelectorAll('input[type="number"]');
-    inputs.forEach(input => input.value = '');
+    inputFields.forEach(input => input.value = '');
 
     // Reset all impairment fields to 0
-    // ... (similar to how you update impairment fields in updateJointImpairment)
+    const impFields = document.querySelectorAll('td[id$="-imp"]');
+    impFields.forEach(field => field.textContent = '0');
+
+    // Reset total impairment fields
+    const totalImpFields = document.querySelectorAll('span[id$="-total-imp"]');
+    totalImpFields.forEach(field => field.textContent = '0 UE = 0 WPI');
 });
