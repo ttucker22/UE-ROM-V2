@@ -1571,35 +1571,51 @@ function calculateImpairment(angle, dataArray, angleKey, impairmentKey) {
 
     const isUlnarDeviation = angleKey === 'ulnarDeviation';
     
-    for (let i = 0; i < dataArray.length; i++) {
-        const currentAngle = dataArray[i][angleKey];
-        const nextAngle = i < dataArray.length - 1 ? dataArray[i + 1][angleKey] : null;
+    if (isUlnarDeviation) {
+        // For ulnar deviation, we need to search the array differently
+        for (let i = dataArray.length - 1; i >= 0; i--) {
+            const currentAngle = dataArray[i][angleKey];
+            const prevAngle = i > 0 ? dataArray[i - 1][angleKey] : null;
 
-        console.log(`Checking: currentAngle = ${currentAngle}, nextAngle = ${nextAngle}, angle = ${angle}`);
+            console.log(`Checking: currentAngle = ${currentAngle}, prevAngle = ${prevAngle}, angle = ${angle}`);
 
-        if (typeof currentAngle === 'string') {
-            if (currentAngle.startsWith('>') && angle > parseFloat(currentAngle.substring(1))) {
-                return dataArray[i][impairmentKey];
-            }
-            if (currentAngle.startsWith('<') && angle < parseFloat(currentAngle.substring(1))) {
-                return dataArray[i][impairmentKey];
-            }
-        } else if (isUlnarDeviation) {
-            if (angle >= 0) {
-                // For positive ulnar deviation angles
-                if (angle === currentAngle || (nextAngle !== null && angle > currentAngle && angle <= nextAngle)) {
+            if (typeof currentAngle === 'string') {
+                if (currentAngle.startsWith('>') && angle > parseFloat(currentAngle.substring(1))) {
+                    return dataArray[i][impairmentKey];
+                }
+                if (currentAngle.startsWith('<') && angle < parseFloat(currentAngle.substring(1))) {
+                    return dataArray[i][impairmentKey];
+                }
+            } else if (angle >= 0) {
+                // For positive angles
+                if (angle === currentAngle || (prevAngle !== null && angle < currentAngle && angle >= prevAngle)) {
                     console.log(`Match found for positive ulnar deviation: ${dataArray[i][impairmentKey]}`);
                     return dataArray[i][impairmentKey];
                 }
             } else {
-                // For negative ulnar deviation angles
-                if (angle === currentAngle || (nextAngle !== null && angle < currentAngle && angle >= nextAngle)) {
+                // For negative angles
+                if (angle === currentAngle || (prevAngle !== null && angle > currentAngle && angle <= prevAngle)) {
                     console.log(`Match found for negative ulnar deviation: ${dataArray[i][impairmentKey]}`);
                     return dataArray[i][impairmentKey];
                 }
             }
-        } else {
-            if (angle === currentAngle || (nextAngle !== null && angle > currentAngle && angle <= nextAngle)) {
+        }
+    } else {
+        // For other movements, keep the original logic
+        for (let i = 0; i < dataArray.length; i++) {
+            const currentAngle = dataArray[i][angleKey];
+            const nextAngle = i < dataArray.length - 1 ? dataArray[i + 1][angleKey] : null;
+
+            console.log(`Checking: currentAngle = ${currentAngle}, nextAngle = ${nextAngle}, angle = ${angle}`);
+
+            if (typeof currentAngle === 'string') {
+                if (currentAngle.startsWith('>') && angle > parseFloat(currentAngle.substring(1))) {
+                    return dataArray[i][impairmentKey];
+                }
+                if (currentAngle.startsWith('<') && angle < parseFloat(currentAngle.substring(1))) {
+                    return dataArray[i][impairmentKey];
+                }
+            } else if (angle === currentAngle || (nextAngle !== null && angle > currentAngle && angle <= nextAngle)) {
                 return dataArray[i][impairmentKey];
             }
         }
