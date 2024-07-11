@@ -1233,11 +1233,18 @@ function updateJointImpairment(jointPrefix, dataFlexExt, dataRadUln) {
     document.getElementById(jointPrefix + '-flexext-imp').textContent = flexextImp;
     document.getElementById(jointPrefix + '-rdud-imp').textContent = rdudImp;
 
-    // Calculate and update total impairment, showing subtotal addition
+    // Calculate and update total impairment, conditionally showing addition
     let totalImp = flexextImp + rdudImp;
     let wpi = Math.round(totalImp * 0.6); // Convert to WPI
-    document.getElementById(jointPrefix + '-total-imp').textContent = 
-        flexextImp + ' + ' + rdudImp + ' = ' + totalImp + ' UE = ' + wpi + ' WPI'; 
+
+    // Display total with addition only if both subtotals are non-zero
+    if (flexextImp !== 0 && rdudImp !== 0) {
+        document.getElementById(jointPrefix + '-total-imp').textContent = 
+            flexextImp + ' + ' + rdudImp + ' = ' + totalImp + ' UE = ' + wpi + ' WPI'; 
+    } else {
+        document.getElementById(jointPrefix + '-total-imp').textContent = 
+            totalImp + ' UE = ' + wpi + ' WPI'; 
+    }
 }
 
 // Event listeners for all input fields
