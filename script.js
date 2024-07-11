@@ -1207,14 +1207,12 @@ function updateJointImpairment(jointPrefix, dataFlexExt, dataRadUln) {
 
     // Calculate and update subtotals, handling empty values correctly
     let flexextImp = Math.max(
-        flexionImp === '' ? 0 : parseInt(flexionImp), 
-        extensionImp === '' ? 0 : parseInt(extensionImp), 
-        flexextAnkylosisImp === '' ? 0 : parseInt(flexextAnkylosisImp)
+        parseInt(flexionImp) + parseInt(extensionImp), // Combine flexion and extension
+        parseInt(flexextAnkylosisImp)
     );
     let rdudImp = Math.max(
-        rdImp === '' ? 0 : parseInt(rdImp), 
-        udImp === '' ? 0 : parseInt(udImp), 
-        rdudAnkylosisImp === '' ? 0 : parseInt(rdudAnkylosisImp)
+        parseInt(rdImp) + parseInt(udImp), // Combine radial and ulnar deviation
+        parseInt(rdudAnkylosisImp)
     );
     document.getElementById(jointPrefix + '-flexext-imp').textContent = flexextImp;
     document.getElementById(jointPrefix + '-rdud-imp').textContent = rdudImp;
