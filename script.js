@@ -1159,7 +1159,7 @@ const SHOULDERInternalExternalRotationData = [
 
 // Function to find impairment based on angle from a data array
 function findImpairment(angle, dataArray, angleField) {
-    let impairment = 0;
+    let impairment = null; // Use null for no impairment
     for (let i = 0; i < dataArray.length; i++) {
         let dataAngle = dataArray[i][angleField];
         // Handle '<' and '>' cases
@@ -1190,31 +1190,31 @@ function updateJointImpairment(jointPrefix, dataFlexExt, dataRadUln) {
     let rdudAnkylosisAngle = parseInt(document.getElementById(jointPrefix + '-rdud-ankylosis-angle').value);
 
     // Find impairments from data arrays, only if angle is a number
-    let flexionImp = isNaN(flexionAngle) ? '' : findImpairment(flexionAngle, dataFlexExt, 'flexion');
-    let extensionImp = isNaN(extensionAngle) ? '' : findImpairment(extensionAngle, dataFlexExt, 'extension');
-    let flexextAnkylosisImp = isNaN(flexextAnkylosisAngle) ? '' : findImpairment(flexextAnkylosisAngle, dataFlexExt, 'ankylosis');
-    let rdImp = isNaN(rdAngle) ? '' : findImpairment(rdAngle, dataRadUln, 'radialDeviation');
-    let udImp = isNaN(udAngle) ? '' : findImpairment(udAngle, dataRadUln, 'ulnarDeviation');
-    let rdudAnkylosisImp = isNaN(rdudAnkylosisAngle) ? '' : findImpairment(rdudAnkylosisAngle, dataRadUln, 'ankylosis');
+    let flexionImp = isNaN(flexionAngle) ? null : findImpairment(flexionAngle, dataFlexExt, 'flexion');
+    let extensionImp = isNaN(extensionAngle) ? null : findImpairment(extensionAngle, dataFlexExt, 'extension');
+    let flexextAnkylosisImp = isNaN(flexextAnkylosisAngle) ? null : findImpairment(flexextAnkylosisAngle, dataFlexExt, 'ankylosis');
+    let rdImp = isNaN(rdAngle) ? null : findImpairment(rdAngle, dataRadUln, 'radialDeviation');
+    let udImp = isNaN(udAngle) ? null : findImpairment(udAngle, dataRadUln, 'ulnarDeviation');
+    let rdudAnkylosisImp = isNaN(rdudAnkylosisAngle) ? null : findImpairment(rdudAnkylosisAngle, dataRadUln, 'ankylosis');
 
     // Update impairment fields in the HTML
-    document.getElementById(jointPrefix + '-flexion-imp').textContent = flexionImp;
-    document.getElementById(jointPrefix + '-extension-imp').textContent = extensionImp;
-    document.getElementById(jointPrefix + '-flexext-ankylosis-imp').textContent = flexextAnkylosisImp;
-    document.getElementById(jointPrefix + '-rd-imp').textContent = rdImp;
-    document.getElementById(jointPrefix + '-ud-imp').textContent = udImp;
-    document.getElementById(jointPrefix + '-rdud-ankylosis-imp').textContent = rdudAnkylosisImp;
+    document.getElementById(jointPrefix + '-flexion-imp').textContent = flexionImp === null ? '' : flexionImp;
+    document.getElementById(jointPrefix + '-extension-imp').textContent = extensionImp === null ? '' : extensionImp;
+    document.getElementById(jointPrefix + '-flexext-ankylosis-imp').textContent = flexextAnkylosisImp === null ? '' : flexextAnkylosisImp;
+    document.getElementById(jointPrefix + '-rd-imp').textContent = rdImp === null ? '' : rdImp;
+    document.getElementById(jointPrefix + '-ud-imp').textContent = udImp === null ? '' : udImp;
+    document.getElementById(jointPrefix + '-rdud-ankylosis-imp').textContent = rdudAnkylosisImp === null ? '' : rdudAnkylosisImp;
 
     // Calculate and update subtotals, handling empty values
     let flexextImp = Math.max(
-        isNaN(flexionImp) ? 0 : flexionImp, 
-        isNaN(extensionImp) ? 0 : extensionImp, 
-        isNaN(flexextAnkylosisImp) ? 0 : flexextAnkylosisImp
+        flexionImp || 0, 
+        extensionImp || 0, 
+        flexextAnkylosisImp || 0
     );
     let rdudImp = Math.max(
-        isNaN(rdImp) ? 0 : rdImp, 
-        isNaN(udImp) ? 0 : udImp, 
-        isNaN(rdudAnkylosisImp) ? 0 : rdudAnkylosisImp
+        rdImp || 0, 
+        udImp || 0, 
+        rdudAnkylosisImp || 0
     );
     document.getElementById(jointPrefix + '-flexext-imp').textContent = flexextImp;
     document.getElementById(jointPrefix + '-rdud-imp').textContent = rdudImp;
@@ -1224,33 +1224,3 @@ function updateJointImpairment(jointPrefix, dataFlexExt, dataRadUln) {
     let wpi = Math.round(totalImp * 0.6); // Convert to WPI
     document.getElementById(jointPrefix + '-total-imp').textContent = totalImp + ' UE = ' + wpi + ' WPI';
 }
-
-// Event listeners for all input fields
-const inputFields = document.querySelectorAll('input[type="number"]');
-inputFields.forEach(input => {
-    input.addEventListener('input', () => {
-        // Determine which joint and data arrays to use based on input ID
-        if (input.id.startsWith('wrist')) {
-            updateJointImpairment('wrist', WRISTFlexionExtensionData, WRISTRadialUlnarDeviationData);
-        } else if (input.id.startsWith('elbow')) {
-            updateJointImpairment('elbow', ELBOWFlexionExtensionData, ELBOWPronationSupinationData);
-        } else if (input.id.startsWith('shoulder')) {
-            updateJointImpairment('shoulder', SHOULDERFlexionExtensionData, SHOULDERAbductionAdductionData);
-            updateJointImpairment('shoulder', SHOULDERFlexionExtensionData, SHOULDERInternalExternalRotationData); // Call twice for shoulder, once for each plane of motion
-        }
-    });
-});
-
-// Clear all button functionality
-document.getElementById('clearAllButton').addEventListener('click', () => {
-    // Clear all input fields
-    inputFields.forEach(input => input.value = '');
-
-    // Reset all impairment fields to 0
-    const impFields = document.querySelectorAll('td[id$="-imp"]');
-    impFields.forEach(field => field.textContent = '0');
-
-    // Reset total impairment fields
-    const totalImpFields = document.querySelectorAll('span[id$="-total-imp"]');
-    totalImpFields.forEach(field => field.textContent = '0 UE = 0 WPI');
-});
