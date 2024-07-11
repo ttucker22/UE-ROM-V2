@@ -1205,15 +1205,37 @@ function updateJointImpairment(jointPrefix, dataFlexExt, dataRadUln) {
     document.getElementById(jointPrefix + '-ud-imp').textContent = udImp;
     document.getElementById(jointPrefix + '-rdud-ankylosis-imp').textContent = rdudAnkylosisImp;
 
-    // Calculate and update subtotals, handling empty values correctly
-    let flexextImp = Math.max(
-        parseInt(flexionImp) + parseInt(extensionImp), // Combine flexion and extension
-        parseInt(flexextAnkylosisImp)
-    );
-    let rdudImp = Math.max(
-        parseInt(rdImp) + parseInt(udImp), // Combine radial and ulnar deviation
-        parseInt(rdudAnkylosisImp)
-    );
+    // Calculate and update subtotals, handling all entry combinations
+    let flexextImp;
+    if (!isNaN(flexextAnkylosisAngle)) {
+        // Ankylosis angle is entered
+        flexextImp = Math.max(
+            parseInt(flexionImp) + parseInt(extensionImp),
+            parseInt(flexextAnkylosisImp)
+        );
+    } else if (!isNaN(flexionAngle) && !isNaN(extensionAngle)) {
+        // Both flexion and extension angles are entered
+        flexextImp = parseInt(flexionImp) + parseInt(extensionImp);
+    } else {
+        // Either only one of flexion/extension is entered, or none are entered
+        flexextImp = Math.max(parseInt(flexionImp), parseInt(extensionImp));
+    }
+
+    let rdudImp;
+    if (!isNaN(rdudAnkylosisAngle)) {
+        // Ankylosis angle is entered
+        rdudImp = Math.max(
+            parseInt(rdImp) + parseInt(udImp),
+            parseInt(rdudAnkylosisImp)
+        );
+    } else if (!isNaN(rdAngle) && !isNaN(udAngle)) {
+        // Both radial and ulnar deviation angles are entered
+        rdudImp = parseInt(rdImp) + parseInt(udImp);
+    } else {
+        // Either only one of rd/ud is entered, or none are entered
+        rdudImp = Math.max(parseInt(rdImp), parseInt(udImp));
+    }
+
     document.getElementById(jointPrefix + '-flexext-imp').textContent = flexextImp;
     document.getElementById(jointPrefix + '-rdud-imp').textContent = rdudImp;
 
