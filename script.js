@@ -1205,35 +1205,29 @@ function updateJointImpairment(jointPrefix, dataFlexExt, dataRadUln) {
     document.getElementById(jointPrefix + '-ud-imp').textContent = udImp;
     document.getElementById(jointPrefix + '-rdud-ankylosis-imp').textContent = rdudAnkylosisImp;
 
-    // Calculate and update subtotals, handling all entry combinations
+    // Calculate and update subtotals, handling NaN values correctly
     let flexextImp;
     if (!isNaN(flexextAnkylosisAngle)) {
-        // Ankylosis angle is entered
         flexextImp = Math.max(
-            parseInt(flexionImp) + parseInt(extensionImp),
+            (parseInt(flexionImp) || 0) + (parseInt(extensionImp) || 0), // Use 0 if NaN
             parseInt(flexextAnkylosisImp)
         );
     } else if (!isNaN(flexionAngle) && !isNaN(extensionAngle)) {
-        // Both flexion and extension angles are entered
-        flexextImp = parseInt(flexionImp) + parseInt(extensionImp);
+        flexextImp = (parseInt(flexionImp) || 0) + (parseInt(extensionImp) || 0); // Use 0 if NaN
     } else {
-        // Either only one of flexion/extension is entered, or none are entered
-        flexextImp = Math.max(parseInt(flexionImp), parseInt(extensionImp));
+        flexextImp = Math.max((parseInt(flexionImp) || 0), (parseInt(extensionImp) || 0)); // Use 0 if NaN
     }
 
     let rdudImp;
     if (!isNaN(rdudAnkylosisAngle)) {
-        // Ankylosis angle is entered
         rdudImp = Math.max(
-            parseInt(rdImp) + parseInt(udImp),
+            (parseInt(rdImp) || 0) + (parseInt(udImp) || 0), // Use 0 if NaN
             parseInt(rdudAnkylosisImp)
         );
     } else if (!isNaN(rdAngle) && !isNaN(udAngle)) {
-        // Both radial and ulnar deviation angles are entered
-        rdudImp = parseInt(rdImp) + parseInt(udImp);
+        rdudImp = (parseInt(rdImp) || 0) + (parseInt(udImp) || 0); // Use 0 if NaN
     } else {
-        // Either only one of rd/ud is entered, or none are entered
-        rdudImp = Math.max(parseInt(rdImp), parseInt(udImp));
+        rdudImp = Math.max((parseInt(rdImp) || 0), (parseInt(udImp) || 0)); // Use 0 if NaN
     }
 
     document.getElementById(jointPrefix + '-flexext-imp').textContent = flexextImp;
