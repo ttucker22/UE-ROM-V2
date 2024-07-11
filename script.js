@@ -1237,7 +1237,7 @@ function updateJointImpairment(jointPrefix, dataFlexExt, dataRadUln) {
     let totalImp = flexextImp + rdudImp;
     let wpi = Math.round(totalImp * 0.6); // Convert to WPI
     document.getElementById(jointPrefix + '-total-imp').textContent = 
-        flexextImp + ' + ' + rdudImp + ' = ' + totalImp + ' UE = ' + wpi + ' WPI';
+        flexextImp + ' + ' + rdudImp + ' = ' + totalImp + ' UE = ' + wpi + ' WPI'; 
 }
 
 // Event listeners for all input fields
