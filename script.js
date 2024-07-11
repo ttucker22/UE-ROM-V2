@@ -1160,7 +1160,7 @@ const SHOULDERInternalExternalRotationData = [
 // Function to find impairment percentage based on angle
 function findImpairment(data, angle, type) {
     for (const entry of data) {
-        if (entry[type] == angle) {
+        if (angle == entry[type]) {
             return entry[`ue${type.charAt(0).toUpperCase() + type.slice(1)}`];
         }
     }
@@ -1172,7 +1172,8 @@ function calculateJointImpairment(jointData, angleInputs, impairmentElements) {
     let totalImpairment = 0;
     angleInputs.forEach((input, index) => {
         const angle = parseFloat(document.getElementById(input).value) || 0;
-        const impairment = findImpairment(jointData[index], angle, input.split('-')[1]);
+        const type = input.split('-')[1];
+        const impairment = findImpairment(jointData[index], angle, type);
         document.getElementById(impairmentElements[index]).innerText = impairment;
         totalImpairment += impairment;
     });
@@ -1182,23 +1183,21 @@ function calculateJointImpairment(jointData, angleInputs, impairmentElements) {
 // Function to update impairment calculations
 function updateImpairment() {
     const wristImpairment = calculateJointImpairment(
-        [WRISTFlexionExtensionData, WRISTRadialUlnarDeviationData],
+        [WRISTFlexionExtensionData, WRISTFlexionExtensionData, WRISTRadialUlnarDeviationData, WRISTRadialUlnarDeviationData],
         ['wrist-flexion-angle', 'wrist-extension-angle', 'wrist-rd-angle', 'wrist-ud-angle'],
         ['wrist-flexion-imp', 'wrist-extension-imp', 'wrist-rd-imp', 'wrist-ud-imp']
     );
     document.getElementById('wrist-total-imp').innerText = `${wristImpairment} UE = ${Math.round(wristImpairment * 0.6)} WPI`;
 
-    // Calculate and update impairment for elbow
     const elbowImpairment = calculateJointImpairment(
-        [ELBOWFlexionExtensionData, ELBOWPronationSupinationData],
+        [ELBOWFlexionExtensionData, ELBOWFlexionExtensionData, ELBOWPronationSupinationData, ELBOWPronationSupinationData],
         ['elbow-flexion-angle', 'elbow-extension-angle', 'elbow-pronation-angle', 'elbow-supination-angle'],
         ['elbow-flexion-imp', 'elbow-extension-imp', 'elbow-pronation-imp', 'elbow-supination-imp']
     );
     document.getElementById('elbow-total-imp').innerText = `${elbowImpairment} UE = ${Math.round(elbowImpairment * 0.6)} WPI`;
 
-    // Calculate and update impairment for shoulder
     const shoulderImpairment = calculateJointImpairment(
-        [SHOULDERFlexionExtensionData, SHOULDERAbductionAdductionData, SHOULDERInternalExternalRotationData],
+        [SHOULDERFlexionExtensionData, SHOULDERFlexionExtensionData, SHOULDERAbductionAdductionData, SHOULDERAbductionAdductionData, SHOULDERInternalExternalRotationData, SHOULDERInternalExternalRotationData],
         ['shoulder-flexion-angle', 'shoulder-extension-angle', 'shoulder-abduction-angle', 'shoulder-adduction-angle', 'shoulder-introt-angle', 'shoulder-extrot-angle'],
         ['shoulder-flexion-imp', 'shoulder-extension-imp', 'shoulder-abduction-imp', 'shoulder-adduction-imp', 'shoulder-introt-imp', 'shoulder-extrot-imp']
     );
@@ -1218,10 +1217,6 @@ document.getElementById('clearAllButton').addEventListener('click', () => {
     document.querySelectorAll('td[id$="-imp"]').forEach(td => {
         td.innerText = '0';
     });
-    document.getElementById('wrist-total-imp').innerText = '0 UE = 0 WPI';
-    document.getElementById('elbow-total-imp').innerText = '0 UE = 0 WPI';
-    document.getElementById('shoulder-total-imp').innerText = '0 UE = 0 WPI';
-});
     document.getElementById('wrist-total-imp').innerText = '0 UE = 0 WPI';
     document.getElementById('elbow-total-imp').innerText = '0 UE = 0 WPI';
     document.getElementById('shoulder-total-imp').innerText = '0 UE = 0 WPI';
