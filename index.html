@@ -1570,46 +1570,42 @@ function calculateImpairment(angle, dataArray, angleKey, impairmentKey) {
     }
 
     const isUlnarDeviation = angleKey === 'ulnarDeviation';
-    const absAngle = Math.abs(angle);
-
+    
     for (let i = 0; i < dataArray.length; i++) {
         const currentAngle = dataArray[i][angleKey];
-        console.log(`Checking: currentAngle = ${currentAngle}, angle = ${angle}, absAngle = ${absAngle}`);
+        const nextAngle = i < dataArray.length - 1 ? dataArray[i + 1][angleKey] : null;
+
+        console.log(`Checking: currentAngle = ${currentAngle}, nextAngle = ${nextAngle}, angle = ${angle}`);
 
         if (typeof currentAngle === 'string') {
-            if (currentAngle.startsWith('>') && absAngle > parseFloat(currentAngle.substring(1))) {
+            if (currentAngle.startsWith('>') && angle > parseFloat(currentAngle.substring(1))) {
                 return dataArray[i][impairmentKey];
             }
-            if (currentAngle.startsWith('<') && absAngle < parseFloat(currentAngle.substring(1))) {
+            if (currentAngle.startsWith('<') && angle < parseFloat(currentAngle.substring(1))) {
                 return dataArray[i][impairmentKey];
             }
         } else if (isUlnarDeviation) {
-            if (absAngle === Math.abs(currentAngle)) {
-                console.log(`Match found for ulnar deviation: ${dataArray[i][impairmentKey]}`);
-                return dataArray[i][impairmentKey];
+            if (angle >= 0) {
+                // For positive ulnar deviation angles
+                if (currentAngle >= 0 && (angle === currentAngle || (nextAngle !== null && angle > currentAngle && angle <= nextAngle))) {
+                    console.log(`Match found for positive ulnar deviation: ${dataArray[i][impairmentKey]}`);
+                    return dataArray[i][impairmentKey];
+                }
+            } else {
+                // For negative ulnar deviation angles
+                if (currentAngle < 0 && (angle === currentAngle || (nextAngle !== null && angle < currentAngle && angle >= nextAngle))) {
+                    console.log(`Match found for negative ulnar deviation: ${dataArray[i][impairmentKey]}`);
+                    return dataArray[i][impairmentKey];
+                }
             }
         } else {
-            if (angle === currentAngle) {
+            if (angle === currentAngle || (nextAngle !== null && angle > currentAngle && angle <= nextAngle)) {
                 return dataArray[i][impairmentKey];
             }
         }
     }
 
-    // If no exact match is found, find the closest value
-    if (isUlnarDeviation) {
-        let closestAngle = dataArray[0][angleKey];
-        let closestImpairment = dataArray[0][impairmentKey];
-        for (let i = 1; i < dataArray.length; i++) {
-            if (Math.abs(Math.abs(dataArray[i][angleKey]) - absAngle) < Math.abs(Math.abs(closestAngle) - absAngle)) {
-                closestAngle = dataArray[i][angleKey];
-                closestImpairment = dataArray[i][impairmentKey];
-            }
-        }
-        console.log(`Closest match found for ulnar deviation: ${closestImpairment}`);
-        return closestImpairment;
-    }
-
-    console.log('No match found, returning 0');
+    console.log('No exact match found, returning 0');
     return 0;
 }
         
