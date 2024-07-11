@@ -1594,7 +1594,7 @@ function calculateImpairment(angle, dataArray, angleKey, impairmentKey) {
                 }
             } else {
                 // For negative ulnar deviation angles
-                if (angle <= currentAngle && (nextAngle === null || angle > nextAngle)) {
+                if (Math.abs(angle) >= Math.abs(currentAngle) && (nextAngle === null || Math.abs(angle) < Math.abs(nextAngle))) {
                     console.log(`Match found for negative ulnar deviation: ${dataArray[i][impairmentKey]}`);
                     return dataArray[i][impairmentKey];
                 }
